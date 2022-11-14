@@ -45,15 +45,15 @@ public class WebSecurityConfig {
 	        authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(passwordEncoder());
 	        return authenticationManagerBuilder.build();
 	    }
-	 
+	 //hasAuthority("CUSTOMER")
 	 @Bean
 	    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		 http      
 		 .cors().and()
          .csrf().disable()
          .authorizeRequests()
-         .antMatchers("/addToCart", "/getCartById","/changePassword","/updateCustomer","/postComment","/getOrdersById","/placeOrder","/update-avatar" ).hasAuthority("CUSTOMER");     
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+         .antMatchers("/addToCart", "/getCartById","/changePassword","/updateCustomer","/postComment","/getOrdersById","/placeOrder","/update-avatar" ).permitAll();     
+//        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 	 

@@ -3,6 +3,12 @@ package com.example.main.models;
 import java.util.List;
 
 public class postOrder {
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
+	}
 	public int getUser_id() {
 		return user_id;
 	}
@@ -27,9 +33,11 @@ public class postOrder {
 	public void setDetailList(List<orderDetail> detailList) {
 		this.detailList = detailList;
 	}
+	
 	private int user_id;
 	private String address;
 	private String status;
+	private String note;
 	private List<orderDetail> detailList;
 	
 	

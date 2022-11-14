@@ -71,11 +71,12 @@ public class userController {
                 )
         );
         user user=(user) authentication.getPrincipal();
-        String jwt = tokenProvider.generateToken(user);
+//        String jwt = tokenProvider.generateToken(user);
         Map<String,Object> map=new HashMap<String, Object>();
-        map.put("token", jwt);
-        map.put("expiredDate", 604800000);
+//        map.put("token", jwt);
+//        map.put("expiredDate", 604800000);
         map.put("avatar",user.getUser_avatar());
+        map.put("id", user.getUser_id());
         return new ResponseObject(200, "Đăng nhập thành công!",map);
     }
     
@@ -83,7 +84,7 @@ public class userController {
     
     @RequestMapping(value="/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE )
     public Map<String, Object> register(@NotBlank @ModelAttribute("email") String email,@NotBlank @Size(min=6, max=12 ) @ModelAttribute("password") String password) {
-
+    	
         userRepo.insertCustomer(email, password );
         Map<String, Object> response=scf.success(200, "Đăng ký thành công!", null);
         
@@ -159,9 +160,9 @@ public class userController {
     	String jwt=request.getHeader("Authorization").substring(7);
     	int id=Integer.parseInt(tokenProvider.getUserIdFromJWT(jwt));
     	user profile=userService.getProfile(id);
-        
         return new ResponseObject(200, "Thành công!", profile);
     }
+     
 //    @RequestMapping(value="/testingFile", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    public Map<String, Object> testFile(@ModelAttribute user user, @RequestPart MultipartFile image, HttpServletRequest http) throws IOException {
 //    	

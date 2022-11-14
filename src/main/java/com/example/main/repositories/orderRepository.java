@@ -32,13 +32,14 @@ public class orderRepository {
 	}
 	
 	public void placeOrder(postOrder ord) {
-		String query="insert into orders(user_id, address, status) values(?,?,'Đang giao')";
+		String query="insert into orders(user_id, address,note, status) values(?,?,?,'Đang giao')";
 		jdbc.update(query,new PreparedStatementSetter() {
 			
 			@Override
 			public void setValues(PreparedStatement ps) throws SQLException {
 				ps.setInt(1, ord.getUser_id());
 				ps.setString(2, ord.getAddress());
+				ps.setString(3, ord.getNote());
 			}
 		} );
 		int order_id=jdbc.query("select order_id from orders where user_id=? order by order_created_at desc", new PreparedStatementSetter() {

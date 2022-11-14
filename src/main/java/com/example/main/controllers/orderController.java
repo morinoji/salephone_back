@@ -39,9 +39,9 @@ public class orderController {
 	}
 
 	@RequestMapping(value="/getOrdersById")
-    public ResponseObject getOrderByUser(@ModelAttribute("status") String status, HttpServletRequest request) {
-	    String jwt=request.getHeader("Authorization").substring(7);
-		String email=tokenProvider.getUserIdFromJWT(jwt);
+    public ResponseObject getOrderByUser(@ModelAttribute("status") String status,@ModelAttribute("email") String email, HttpServletRequest request) {
+//	    String jwt=request.getHeader("Authorization").substring(7);
+//		String email=tokenProvider.getUserIdFromJWT(jwt);
 		List<order> list=orderSv.findByUser(email, status);
         return new ResponseObject(200, "Thành công!", list);
     }  
