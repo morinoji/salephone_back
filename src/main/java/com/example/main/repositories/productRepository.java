@@ -66,22 +66,15 @@ public class productRepository {
 //		return thumbNail;
 //	}
 	
-	public List<product> search(Integer category_id, Integer price, String searchText){
+	public List<product> search(String searchText){
 		String search=searchText==null? "":searchText;
 		String query="";
-		if(category_id != null && price != null) {
-			query="Select * from product where category_id='"+category_id+"' and price<='"+price+"' and slug like '%"+search+"%'";
-		}else if(price != null) {
-			query="Select * from product where price<='"+price+"' and slug like '%"+search+"%'";
-		}else if(category_id!=null) {
-			query="Select * from product where category_id='"+category_id+"' and slug like '%"+search+"%'";
-		}else {
+		
 			query="Select * from product where slug like '%"+search+"%'";
-		}
+		
 		List<product> listProd=jdbc.query(query, BeanPropertyRowMapper.newInstance(product.class));
 		return listProd;
 	}
-	
 	
 	public product getDetail(String slug) {
 		String query="Select * from product inner join productdetail on product.detail_id = productdetail.detail_id left join productimage on product.product_id=productimage.product_id where product.slug='"+slug+"'";
@@ -99,6 +92,7 @@ public class productRepository {
 					prod.setProduct_content(rs.getString("product_content"));
 					prod.setPrice(rs.getLong("price"));
 					prod.setRating(rs.getFloat("rating"));
+					prod.setRated(rs.getInt("rated"));
 					prod.setBrand(rs.getString("brand"));
 					prod.setSlug(rs.getString("slug"));
 					prod.setThumbnail(rs.getString("thumbnail"));

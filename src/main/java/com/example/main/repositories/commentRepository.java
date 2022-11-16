@@ -52,9 +52,27 @@ public class commentRepository {
 	
 	@Transactional
 	public void insertComment(String content, float star, int product_id, int user_id) {
+		String updateProduct="";
 		String query="insert into comments(user_id, product_id, comment_content, stars) values('"+user_id+"','"+product_id+"','"+content+"','"+star+"')";
 		jdbc.execute(query);
-		String updateProduct="update product set rated=rated+1, rating=rating+"+star+" where product_id="+product_id;
+		switch(Math.round(star)) {
+			case 5:
+				updateProduct="update product set rated=rated+1, rating=rating+"+star+", star5=star5+1 where product_id="+product_id;
+				break;
+			case 4:
+				updateProduct="update product set rated=rated+1, rating=rating+"+star+", star4=star4+1 where product_id="+product_id;
+				break;
+			case 3:
+				updateProduct="update product set rated=rated+1, rating=rating+"+star+", star3=star3+1 where product_id="+product_id;
+				break;
+			case 2:
+				updateProduct="update product set rated=rated+1, rating=rating+"+star+", star2=star2+1 where product_id="+product_id;
+				break;
+			case 1:
+				updateProduct="update product set rated=rated+1, rating=rating+"+star+", star1=star1+1 where product_id="+product_id;
+				break;
+		}
+		
 		jdbc.execute(updateProduct);
 	}
 }

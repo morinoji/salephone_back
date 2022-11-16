@@ -26,8 +26,8 @@ public class productService {
 		return listProd;
 	}
 	
-	public List<product> search(int category_id, int price, String searchText){
-    	List<product> listProd=productRepo.search(category_id,price,Utils.toSlug(searchText));
+	public List<product> search( String searchText){
+    	List<product> listProd=productRepo.search(Utils.toSlug(searchText));
     	if(listProd.isEmpty()) {
     		throw new NoDataFoundException();
     	}

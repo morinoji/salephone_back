@@ -55,9 +55,11 @@ public class productController {
     
     
     @RequestMapping(value="/search")
-    public ResponseObject searchProduct(@Null @RequestParam(value="category_id", required=false) Integer category_id,@Null @RequestParam(value="price",required=false) Integer price,@Null @RequestParam(value="searchText", required=false) String searchText) {
-    	return new ResponseObject(200, "Thành công!", productSv.search(category_id,price,Utils.toSlug(searchText)));
+    public ResponseObject searchProduct(@Null @RequestParam(value="category_id", required=false) Integer category_id,@Null @RequestParam(value="searchText", required=false) String searchText) {
+    	return new ResponseObject(200, "Thành công!", productSv.search(Utils.toSlug(searchText)));
     }  
+    
+    
     @RequestMapping(value="/detail")
     public ResponseObject searchProduct(@NotNull @RequestParam(value="prd") String slug) {
         return new ResponseObject(200, "Thành công!", productSv.getDetail(slug));

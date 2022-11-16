@@ -13,6 +13,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -61,7 +64,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
 	public ResponseEntity<Object> badCredentials(SQLIntegrityConstraintViolationException ex){
-		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, 400 , ex.getMessage(), null);
+		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, 400 , "Email đã trùng!", null);
+		ResponseEntity<Object> response=new ResponseEntity<Object>(error1, error1.getStatus());
+		return response;
+	}
+
+	@ExceptionHandler(IndexOutOfBoundsException.class)
+	public ResponseEntity<Object> outOfBound(IndexOutOfBoundsException ex){
+		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR, 500 , ex.getMessage(), null);
+		ResponseEntity<Object> response=new ResponseEntity<Object>(error1, error1.getStatus());
+		return response;
+	}
+	
+	
+	@ExceptionHandler(InvalidRequestBodyException.class)
+	public ResponseEntity<Object> invalidFormatJson(InvalidRequestBodyException ex){
+		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, 400 , "Invalid Request Body Type !", null);
+		ResponseEntity<Object> response=new ResponseEntity<Object>(error1, error1.getStatus());
+		return response;
+	}
+	
+	@ExceptionHandler(BadCredentialException.class)
+	public ResponseEntity<Object> badCredentialCustom(BadCredentialException ex){
+		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, 500 , "Đăng nhập thất bại!", null);
 		ResponseEntity<Object> response=new ResponseEntity<Object>(error1, error1.getStatus());
 		return response;
 	}

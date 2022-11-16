@@ -65,9 +65,9 @@ public class orderRepository {
 		
 	}
 	
-	public List<order> getByUser(String email,String status) {
-			Integer id=userRepo.findId(email);
-			String query="Select * from orders left join orderdetail on orders.order_id = orderdetail.order_id inner join product on orderdetail.product_id=product.product_id where orders.user_id="+id+" and orders.status like '%"+status+"%'";
+	public List<order> getByUser(int id,String status) {
+//			Integer id=userRepo.findId(email);
+			String query="Select * from orders inner join orderdetail on orders.order_id = orderdetail.order_id left join product on orderdetail.product_id=product.product_id where orders.user_id="+id+" and orders.status like '%"+status+"%' order by order_created_at desc";
 			
 			return jdbc.query(query, new ResultSetExtractor<List<order>>() {
 				@Override
@@ -96,6 +96,8 @@ public class orderRepository {
 							map.put("product_id", rs.getInt("product_id"));
 							map.put("quantity", rs.getInt("quantity"));
 							map.put("title", rs.getString("title"));
+							map.put("brand", rs.getString("brand"));
+							map.put("price",rs.getInt("price"));
 							map.put("thumbnail", rs.getString("thumbnail"));
 							map.put("orderdetail_created_at", rs.getString("orderdetail_created_at"));
 							map.put("orderdetail_updated_at", rs.getString("orderdetail_updated_at"));

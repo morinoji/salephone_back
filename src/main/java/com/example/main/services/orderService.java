@@ -18,8 +18,8 @@ public class orderService {
 		this.orderRepo = orderRepo;
 	}
 	
-	public List<order> findByUser(String email, String status){
-		 List<order> temp=orderRepo.getByUser(email,status);
+	public List<order> findByUser(int id, String status){
+		 List<order> temp=orderRepo.getByUser(id,status);
 	    	if(temp.isEmpty()) {
 	    		throw new NoDataFoundException();
 	    	}

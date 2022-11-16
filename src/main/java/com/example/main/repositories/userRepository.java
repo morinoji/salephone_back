@@ -88,35 +88,40 @@ public class userRepository {
 	}
 	
 	public void insertCustomer(String email, String password) {
-		BCryptPasswordEncoder encoder= new BCryptPasswordEncoder();
-		String enPassword=encoder.encode(password);
-		String query="insert into usertable(user_email, user_password,role_id) values('"+email+"','"+enPassword+"',4)";
+//		BCryptPasswordEncoder encoder= new BCryptPasswordEncoder();
+//		String enPassword=encoder.encode(password);
+		String query="insert into usertable(user_email, user_password,role_id) values('"+email+"','"+password+"',4)";
 		jdbc.execute(query);
 	}
 	
-	public void updateAvatar( String avatar, String ogEmail ) {
-		String query="update usertable set user_avatar='"+avatar+"' where user_email='"+ogEmail+"'";
+	public void updateAvatar( String avatar, int id ) {
+		String query="update usertable set user_avatar='"+avatar+"' where user_id='"+id+"'";
 		jdbc.execute(query);
 	}
 	
-	public void updateCustomer(String fullname,String email,String phone_number, String dob, String address,  String ogEmail ) {
-		String query="update usertable set user_fullname='"+fullname+"', user_date_of_birth=TO_DATE('"+dob+"','YYYY-MM-DD'),user_address='"+address+"',user_phone_number='"+phone_number+"',user_email='"+email+"' where user_email='"+ogEmail+"'";
+	public void updateCustomer(String fullname,String phone_number, String dob, String address, int id) {
+		String query="update usertable set user_fullname='"+fullname+"', user_date_of_birth=TO_DATE('"+dob+"','YYYY-MM-DD'),user_address='"+address+"',user_phone_number='"+phone_number+"' where user_id='"+id+"'";
 		jdbc.execute(query);
 	}
 	
-	public String changePassword(String email,String oldPassword, String password) {
-		BCryptPasswordEncoder encoder= new BCryptPasswordEncoder();
-		String oldPW=jdbc.queryForObject("select user_password from usertable where user_email='"+email +"'", BeanPropertyRowMapper.newInstance(user.class)).getPassword();
-		
-		boolean checkOldPw=encoder.matches(oldPassword, oldPW);
-		if(checkOldPw==false) {
-			return "Old password does not match!";
-		}else {
-			String enPassword=encoder.encode(password);
-			String query="update usertable set user_password='"+enPassword+"' where user_email='"+email+"'";
+	public String changePassword(int id,String oldPassword, String password) {
+//		BCryptPasswordEncoder encoder= new BCryptPasswordEncoder();
+		String oldPW=jdbc.queryForObject("select user_password from usertable where user_id='"+id +"'", BeanPropertyRowMapper.newInstance(user.class)).getPassword();
+//		boolean checkOldPw=encoder.matches(oldPassword, oldPW);
+		if(oldPassword.equals(oldPW)) {
+//			String enPassword=encoder.encode(password);
+			String query="update usertable set user_password='"+password+"' where user_id='"+id+"'";
 			jdbc.execute(query);
 			return "Success!";
+			
+		}else {
+			return "Password cũ không trùng khớp!";
 		}
 		
 	}
+	
+	public List<user> login(String email, String password) {
+		return jdbc.query("select * from usertable where user_email='"+email+"' and user_password='"+password+"'", BeanPropertyRowMapper.newInstance(user.class));
+	}
+	
 }

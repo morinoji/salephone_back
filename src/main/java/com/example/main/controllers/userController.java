@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,18 +31,23 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.main.config.constant;
+import com.example.main.exceptions.BadCredentialException;
 import com.example.main.exceptions.successTemplate;
 import com.example.main.jwt.JwtTokenProvider;
 import com.example.main.models.ResponseObject;
 import com.example.main.models.user;
 import com.example.main.repositories.userRepository;
 import com.example.main.services.UserService;
+
+
+
 import com.example.main.models.changePassword;
 
 @RestController
@@ -64,19 +71,24 @@ public class userController {
     @RequestMapping(value="/login", method = RequestMethod.POST)
     public ResponseObject login(@NotBlank @ModelAttribute("email") String email,@NotBlank @Size(min=6, max=12 ) @ModelAttribute("password") String password) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                		email,
-                        password
-                )
-        );
-        user user=(user) authentication.getPrincipal();
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                		email,
+//                        password
+//                )
+//        );
+//        user user=(user) authentication.getPrincipal();
 //        String jwt = tokenProvider.generateToken(user);
+    	
         Map<String,Object> map=new HashMap<String, Object>();
 //        map.put("token", jwt);
 //        map.put("expiredDate", 604800000);
-        map.put("avatar",user.getUser_avatar());
-        map.put("id", user.getUser_id());
+        List<user> result=userService.login(email, password);
+        if(result.isEmpty()) {
+        	throw new BadCredentialException();
+        }
+        map.put("avatar",result.get(0).getUser_avatar());
+        map.put("id", result.get(0).getUser_id());
         return new ResponseObject(200, "Đăng nhập thành công!",map);
     }
     
@@ -95,22 +107,22 @@ public class userController {
     public Map<String, Object> registerJSON(@RequestBody user user) {
     	System.out.print(user.getUser_email());
     	
-        userRepo.insertCustomer(user.getUser_email(), user.getPassword());
+        userService.register(user.getUser_email(), user.getPassword());
         Map<String, Object> response=scf.success(200, "Đăng ký thành công!",null);
         
         return response;
     }
     
     @RequestMapping(value="/update-avatar", method = RequestMethod.PUT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
-    public ResponseObject update(HttpServletRequest request,@RequestPart MultipartFile avatar, @ModelAttribute("old_avatar") String old_avatar) throws IOException {
+    public ResponseObject update(@ModelAttribute("id") int id,@RequestPart MultipartFile avatar, @ModelAttribute("old_avatar") String old_avatar) throws IOException {
     byte[] bytes = avatar.getBytes();
-    String jwt=request.getHeader("Authorization").substring(7);
-	String ogEmail=tokenProvider.getUserIdFromJWT(jwt);
+//    String jwt=request.getHeader("Authorization").substring(7);
+//	String ogEmail=tokenProvider.getUserIdFromJWT(jwt);
     	String genName=UUID.randomUUID().toString();
     	String finalName=genName+"."+ avatar.getOriginalFilename().split("\\.")[1];
 		Path path = Paths.get(constant.imageDir+"avatars/" + finalName);
 		Files.write(path, bytes);
-        userRepo.updateAvatar(finalName, ogEmail);
+        userRepo.updateAvatar(finalName, id);
         File fileToDelete = new File(constant.imageDir+"avatars/"+ old_avatar);
         fileToDelete.delete();
         
@@ -118,11 +130,11 @@ public class userController {
     }
     
     @RequestMapping(value="/updateCustomer", method = RequestMethod.PUT)
-    public ResponseObject update(HttpServletRequest request,@RequestBody user user) throws IOException {
+    public ResponseObject update(@RequestBody user user) throws IOException {
 
-    String jwt=request.getHeader("Authorization").substring(7);
-	String ogEmail=tokenProvider.getUserIdFromJWT(jwt);
-        userRepo.updateCustomer(user.getUser_fullname(),user.getUser_email(),user.getUser_phone_number(), user.getUser_date_of_birth(), user.getUser_address(), ogEmail);
+//    String jwt=request.getHeader("Authorization").substring(7);
+//	String ogEmail=tokenProvider.getUserIdFromJWT(jwt);
+	userService.updateCustomer(user.getUser_fullname(),user.getUser_phone_number(), user.getUser_date_of_birth(), user.getUser_address(), user.getUser_id());
          
         
         return new ResponseObject(200, "Cập nhật thông tin thành công!", null);
@@ -130,16 +142,16 @@ public class userController {
     
     
     @RequestMapping(value="/changePassword", method = RequestMethod.PUT )
-    public ResponseObject changePassword(@RequestBody changePassword user) {
-    	
-       String result= userRepo.changePassword(user.getEmail(), user.getOld_password(),user.getNew_password());
-     ResponseObject response;
+    public ResponseEntity<Object> changePassword(@RequestBody changePassword user) {
+       String result= userService.changePassword( user.getOld_password(),user.getNew_password(), user.getId());
+       ResponseEntity<Object> response;
         if(result!="Success!") {
-        	response=new ResponseObject(401, result, null);
+        	response= ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(400, result,null));
         }else {
-        	response=new ResponseObject(200, "Change Password Success!", null);
+        	response=ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(200, "Đổi mật khẩu thành công!",null));
         }
-        
+    	
+//    	String result=userService.changePassword( user.getOld_password(),user.getNew_password(), user.getId());
         return response;
     }
 //    @RequestMapping(value="/changePassword", method = RequestMethod.PUT,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE )
@@ -156,9 +168,9 @@ public class userController {
 //        return response;
 //    }
     @RequestMapping(value="/get-profile" )
-    public ResponseObject changePassword1(HttpServletRequest request) {
-    	String jwt=request.getHeader("Authorization").substring(7);
-    	int id=Integer.parseInt(tokenProvider.getUserIdFromJWT(jwt));
+    public ResponseObject getProfile(@NotNull @RequestParam("id") Integer id) {
+//    	String jwt=request.getHeader("Authorization").substring(7);
+//    	int id=Integer.parseInt(tokenProvider.getUserIdFromJWT(jwt));
     	user profile=userService.getProfile(id);
         return new ResponseObject(200, "Thành công!", profile);
     }

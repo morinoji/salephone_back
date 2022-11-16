@@ -50,6 +50,7 @@ public class commentController {
 	@RequestMapping(value="/postComment",method = RequestMethod.POST)
     public ResponseObject postComment(@Valid @RequestBody comment cmt) {
     	cmtRepo.insertComment(cmt.getComment_content(), cmt.getStars(), cmt.getProduct_id(), cmt.getUser_id());
+    	
         return new ResponseObject(200, "Đánh giá thành công!", null);
     }
 }
