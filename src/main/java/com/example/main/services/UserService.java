@@ -8,25 +8,25 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.main.models.user;
-import com.example.main.repositories.userRepository;
+import com.example.main.models.User;
+import com.example.main.repositories.UserRepository;
 
 @Service
 public class UserService implements UserDetailsService {
 	@Autowired
-	private userRepository userRepo;
+	private UserRepository userRepo;
 
 	@Override
-	public user loadUserByUsername(String email) throws UsernameNotFoundException {
-		user userData=userRepo.findByUserName(email);
+	public User loadUserByUsername(String email) throws UsernameNotFoundException {
+		User userData=userRepo.findByUserName(email);
 		if(userData==null) {
 			throw new UsernameNotFoundException(email);
 		}
 		return userData;
 	}
 	
-	public user getProfile(int id) {
-		user profile=userRepo.getProfile(id).get(0);
+	public User getProfile(int id) {
+		User profile=userRepo.getProfile(id).get(0);
 		return profile;
 	}
 	
@@ -38,15 +38,15 @@ public class UserService implements UserDetailsService {
 		return userRepo.changePassword(id, oldPassword, password);
 	}
 	
-	public user getUserById(int id){
-		user userData=userRepo.getUserById(id);
+	public User getUserById(int id){
+		User userData=userRepo.getUserById(id);
 		if(userData==null) {
 			throw new UsernameNotFoundException(id+"") ;
 		}
 		return userData;
 	}
 	
-	public List<user> login(String email, String password){
+	public List<User> login(String email, String password){
 		return userRepo.login(email, password);
 	}
 	

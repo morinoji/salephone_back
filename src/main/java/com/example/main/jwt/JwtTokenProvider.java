@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import com.example.main.models.user;
+import com.example.main.models.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -20,7 +20,7 @@ public class JwtTokenProvider {
 	private final String JWT_SECRET = "hollow";
 	private final long JWT_EXPIRATION = 604800000L;
 
-	public String generateToken(user user) {
+	public String generateToken(User user) {
 		Date now = new Date();
 		Date expire = new Date(now.getTime() + JWT_EXPIRATION);
 	

@@ -86,8 +86,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(BadCredentialException.class)
 	public ResponseEntity<Object> badCredentialCustom(BadCredentialException ex){
-		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, 500 , "Đăng nhập thất bại!", null);
+		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, 400 , "Đăng nhập thất bại!", null);
 		ResponseEntity<Object> response=new ResponseEntity<Object>(error1, error1.getStatus());
 		return response;
 	}
+	//------------------------------------------------------------------
+	@ExceptionHandler(InvalidFormatException.class)
+	public ResponseEntity<Object> invalidFormat(InvalidFormatException ex){
+		ApiError error1=new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, 400 , ex.getMessage(), null);
+		ResponseEntity<Object> response=new ResponseEntity<Object>(error1, error1.getStatus());
+		return response;
+	}
+	//------------------------------------------------------------------
 }

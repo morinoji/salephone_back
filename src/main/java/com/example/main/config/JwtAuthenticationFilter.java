@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.main.jwt.JwtTokenProvider;
-import com.example.main.models.user;
+import com.example.main.models.User;
 import com.example.main.services.UserService;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				if(StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
 					
 					int id=Integer.parseInt(jwtProvider.getUserIdFromJWT(jwt));
-					user userData= userService.getUserById(id);
+					User userData= userService.getUserById(id);
 
 					if(userData != null) {
 
