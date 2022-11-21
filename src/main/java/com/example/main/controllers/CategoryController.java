@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,19 +60,20 @@ public CategoryController(CategoryService cateSv, UserRepository userRepo) {
 	}
 	
 	
-//	@RequestMapping(value="/all")
-//	public user getUser(){
-//		return userRepo.findByUserName("morinoji");
-//	}
+	@RequestMapping(value="/deleteCategory", method=RequestMethod.DELETE)
+	public ResponseEntity<Object> deleteCategory(@RequestBody Category category){
+		return new ResponseEntity<Object>(new ResponseObject(200, cateSv.deleteCategory(category.getCategoryId()),null), HttpStatus.OK);
+	}
 	
-//	@RequestMapping(value="/addCategory", method = RequestMethod.POST)
-//	public ResponseEntity<Object> addCategory(@NotBlank @Size(min=5,max=10) @ModelAttribute("categoryName") String cateName,@Min(value=0) @ModelAttribute("parentId") int parentId, BindingResult result){
-//		return new ResponseEntity<Object>(sc.success(200, "Thêm category thành công!", "success", "/addCategory"), HttpStatus.OK);
-//	}
-//	
-//	@RequestMapping(value="/updateCategory", method = RequestMethod.POST)
-//	public ResponseEntity<Object> updateCategory(@NotBlank @Size(min=5,max=10) @ModelAttribute("categoryName") String cateName,@Min(value=0) @ModelAttribute("parentId") int parentId, BindingResult result){
-//		return new ResponseEntity<Object>(sc.success(200, "Chỉnh sửa category thành công!", "success", "/updateCategory"), HttpStatus.OK);
-//	}
+	@RequestMapping(value="/addCategory", method = RequestMethod.POST)
+	public ResponseEntity<Object> addCategory(@RequestBody Category category){
+		return new ResponseEntity<Object>(new ResponseObject(200, cateSv.addNewCategory(category.getCategoryName()),null), HttpStatus.OK);
+		
+	}
+	
+	@RequestMapping(value="/updateCategory", method = RequestMethod.PUT)
+	public ResponseEntity<Object> updateCategory(@RequestBody Category category){
+		return new ResponseEntity<Object>(new ResponseObject(200, cateSv.editCategory(category.getCategoryId(), category.getCategoryName()),null), HttpStatus.OK);
+	}
 }
 

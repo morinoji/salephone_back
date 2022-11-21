@@ -5,16 +5,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -76,27 +79,48 @@ public class ProductController {
     
     @RequestMapping(value="/addProduct", method = RequestMethod.POST)
     public ResponseObject addProduct(@RequestBody Product product) {
-        return new ResponseObject(200, "Thành công!", productSv.addProduct(product));
+        return new ResponseObject(200, productSv.addProduct(product),null );
+    }  
+    
+    @RequestMapping(value="/editProduct", method = RequestMethod.PUT)
+    public ResponseObject editProduct(@RequestBody Product product) {
+        return new ResponseObject(200, productSv.EditProduct(product),null );
     }  
     
     @RequestMapping(value="/uploadProductImage", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseObject uploadProductImage(@RequestPart MultipartFile thumbnail ,@RequestPart MultipartFile[] imageList, @ModelAttribute("product_id") int product_id) throws IOException {
+    public ResponseObject uploadProductImage(@RequestPart(required = false) MultipartFile thumbNail ,@RequestPart(required = false) MultipartFile[] imageList, @ModelAttribute("product_id") int product_id) throws IOException {
     	List<String> imageNameList=new ArrayList<>();
-        byte[] bytes = thumbnail.getBytes();
-    	String genName=UUID.randomUUID().toString();
-    	String finalName=genName+"."+ thumbnail.getOriginalFilename().split("\\.")[1];
-		Path path = Paths.get(Constant.imageDir+"thumbnails/" + finalName);
-		Files.write(path, bytes);
-		for(MultipartFile element:imageList) {
+    	String finalName="";
+    	if(thumbNail!=null) {
+    		byte[] bytes = thumbNail.getBytes();
+        	String genName=UUID.randomUUID().toString();
+        	 finalName=genName+"."+ thumbNail.getOriginalFilename().split("\\.")[1];
+    		Path path = Paths.get(Constant.imageDir+"thumbnails/" + finalName);
+    		Files.write(path, bytes);
+    	}
+
+        if(imageList!=null) {
+        	for(MultipartFile element:imageList) {
 				byte[] bytesTemp = element.getBytes();
 		    	String genNameTemp=UUID.randomUUID().toString();
-		    	String finalNameTemp=genNameTemp+"."+ thumbnail.getOriginalFilename().split("\\.")[1];
+		    	String finalNameTemp=genNameTemp+"."+ element.getOriginalFilename().split("\\.")[1];
 				Path pathTemp = Paths.get(Constant.imageDir+"products/" + finalNameTemp);
 				Files.write(pathTemp, bytesTemp);
 				imageNameList.add(finalNameTemp);
 		}
+        }
+		
 		productSv.uploadImages(finalName, product_id, imageNameList);
         return new ResponseObject(200, "Upload ảnh thành công!", null);
+    }  
+    
+    @RequestMapping(value="/removeImage", method = RequestMethod.DELETE)
+    public ResponseObject removeImage(@RequestBody Product product) throws IOException {
+    	
+    	List<String> mainList = new ArrayList<String>();
+    	mainList.addAll(product.getImageList());
+		productSv.RemoveImages(product.getThumbnail(), mainList);
+        return new ResponseObject(200, "Xóa ảnh thành công!", null);
     }  
     
 }

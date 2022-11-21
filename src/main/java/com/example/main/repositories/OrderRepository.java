@@ -127,4 +127,16 @@ public class OrderRepository {
 		});
 	}
 	
+	public void DeleteOrder(int order_id) {
+		String query="delete from orders where order_id=?";
+		jdbc.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setInt(1, order_id);
+				
+			}
+		});
+	}
+	
 }

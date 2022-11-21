@@ -53,14 +53,14 @@ public class ProductRepository {
 		return listProd;
 	}
 	
-	public List<Product> findByCategory(int category_id){
-		String query="Select * from product where category_id='"+category_id+"'";
+	public List<Product> findByCategory(int categoryId){
+		String query="Select * from product where category_id='"+categoryId+"'";
 		List<Product> listProd=jdbc.query(query, BeanPropertyRowMapper.newInstance(Product.class));
 		return listProd;
 	}
 	
-	public Map<String, String> findById(int product_id){
-		String query="Select title,thumbnail  from product where product_id='"+product_id+"'";
+	public Map<String, String> findById(int productId){
+		String query="Select title,thumbnail  from product where product_id='"+productId+"'";
 		Product listProd=jdbc.queryForObject(query, BeanPropertyRowMapper.newInstance(Product.class));
 		Map<String, String> tempProd=new HashMap<>();
 		tempProd.put("title", listProd.getTitle());
@@ -116,7 +116,9 @@ public class ProductRepository {
 					if(prod.getDetail()==null) {
 						prod.setDetail(new ProductDetail(rs.getInt("detail_id"),rs.getString("model_name"),rs.getString("detail_screen"),rs.getString("detail_os"), rs.getString("detail_behindcam"),rs.getString("detail_frontcam"),rs.getString("detail_chip"),rs.getString("detail_ram"),rs.getString("detail_internalmem"),rs.getString("detail_sim"),rs.getString("detail_pin"), rs.getString("detail_created_at"),rs.getString("detail_updated_at")));
 					}
-					listImage.add(rs.getString("image_name"));
+					if(rs.getString("image_name")!=null) {
+						listImage.add(rs.getString("image_name"));
+					}
 //					System.out.print(rs.getString("present").split("\\+"));
 					prod.setPresentList(Arrays.asList(rs.getString("presents").split("\\+")));
 					prod.setColorList(Arrays.asList(rs.getString("colors").split("\\+")));
@@ -159,20 +161,100 @@ public class ProductRepository {
 		return keyHolder.getKey().intValue();
 	}
 	
-	public String uploadImages(String thumbnail, int product_id, List<String> imageList) {
-		String query="update product set thumbnail='"+thumbnail+"' where product_id='"+product_id+"'";
-		jdbc.update(query);
+	
+	public String uploadImages(String thumbNail, int productId, List<String> imageList) {
+		if(thumbNail!="") {
+			String query="update product set thumbnail='"+thumbNail+"' where product_id='"+productId+"'";
+			jdbc.update(query);
+		}
 		
-		for(String element:imageList) {
+		if(!imageList.isEmpty()) {
+			for(String element:imageList) {
 				jdbc.update("insert into productimage(image_name, product_id) values(?,?)", new PreparedStatementSetter() {
 				
 				@Override
 				public void setValues(PreparedStatement ps) throws SQLException {
 					ps.setString(1, element);
-					ps.setInt(2, product_id);
+					ps.setInt(2, productId);
 				}
 			});
 		}
+		}
+		
 		return "Upload images success!";
+	}
+	
+	public String RemoveImages(String thumbNail, List<String> imageList) {
+		if(thumbNail!=null || thumbNail!="") {
+			String query="delete from product where thumbnail=? ";
+			jdbc.update(query, new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException {
+					ps.setString(1, thumbNail);
+					
+				}
+			});
+		}
+
+		if(!imageList.isEmpty()) {
+			for(String element:imageList) {
+				jdbc.update("delete from  productimage where image_name=?", new PreparedStatementSetter() {
+				
+				@Override
+				public void setValues(PreparedStatement ps) throws SQLException {
+					ps.setString(1, element);
+				}
+			});
+		}
+		}
+		
+		return "Remove images Success!";
+	}
+	
+	public String EditProductDetail(ProductDetail detail ) {
+		String query="update productdetail set model_name= ?, detail_screen=?, detail_os=?, detail_behindcam=?, detail_frontcam=?, detail_chip=?, detail_ram=?, detail_internalmem=?, detail_sim=?, detail_pin=?  where detail_id='"+detail.getDetail_id()+"'";		
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+
+		jdbc.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, detail.getModel_name());
+				ps.setString(2, detail.getDetail_screen());
+				ps.setString(3, detail.getDetail_os());
+				ps.setString(4, detail.getDetail_behindcam());
+				ps.setString(5, detail.getDetail_frontcam());
+				ps.setString(6, detail.getDetail_chip());
+				ps.setString(7, detail.getDetail_ram());
+				ps.setString(8, detail.getDetail_internalmem());
+				ps.setString(9, detail.getDetail_sim());
+				ps.setString(10, detail.getDetail_pin());
+			}
+		});
+		
+		return "Success";
+	}
+	
+	public String EditProduct(Product product ) {
+		EditProductDetail(product.getDetail());
+		String query="update product set title=?,product_content=?, price=?, brand=?, category_id=?, slug=?, colors=?, presents=? where product_id='"+product.getProduct_id()+"'";	
+
+		jdbc.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, product.getTitle());
+				ps.setString(2, product.getProduct_content());
+				ps.setLong(3, product.getPrice());
+				ps.setString(4, product.getBrand());
+				ps.setInt(5, product.getCategory_id());
+				ps.setString(6, Utils.toSlug(product.getTitle()));
+				ps.setString(7, product.getColors());
+				ps.setString(8, product.getPresents());
+			}
+		});
+		
+		return "Chỉnh sửa sản phẩm thành công!";
 	}
 }

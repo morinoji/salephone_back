@@ -63,8 +63,18 @@ public class ProductService {
 		return id+"";
 	}
 	
+	public String EditProduct(Product product) {
+		String result=productRepo.EditProduct(product);
+		return result;
+	}
+	
 	public String uploadImages(String thumbnail, int product_id, List<String> imageList) {
 		String result=productRepo.uploadImages(thumbnail, product_id, imageList);
+		return result;
+	}
+	
+	public String RemoveImages(String thumbNail, List<String> imageList) {
+		String result=productRepo.RemoveImages(thumbNail, imageList);
 		return result;
 	}
 }

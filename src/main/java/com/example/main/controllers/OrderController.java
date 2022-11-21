@@ -50,9 +50,15 @@ public class OrderController {
 		orderSv.placeOrder(postOrder);
         return new ResponseObject(200, "Đặt hàng thành công!", null);
     }  
-	@RequestMapping(value="/updateStatus",method = RequestMethod.POST)
+	@RequestMapping(value="/updateStatus",method = RequestMethod.PUT)
     public ResponseObject updateStatus(@RequestBody Order order ) {
 		orderSv.updateStatus(order);
 		return new ResponseObject(200, "Cập nhật trạng thái thành công!", null);
+    }  
+	
+	@RequestMapping(value="/deleteOrder",method = RequestMethod.DELETE)
+    public ResponseObject DeleteOrder(@RequestBody Order order) {
+		orderSv.DeleteOrder(order);
+		return new ResponseObject(200, "Xóa đơn hàng thành công!", null);
     }  
 }

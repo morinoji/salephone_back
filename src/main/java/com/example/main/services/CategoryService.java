@@ -9,14 +9,26 @@ import com.example.main.repositories.CategoryRepository;
 
 @Service
 public class CategoryService {
-	private CategoryRepository careRepo;
+	private CategoryRepository cateRepo;
 
-	public CategoryService(CategoryRepository careRepo) {
+	public CategoryService(CategoryRepository cateRepo) {
 		super();
-		this.careRepo = careRepo;
+		this.cateRepo = cateRepo;
 	}
 	
 	public List<Category> findAll(){
-		return careRepo.findAll();
+		return cateRepo.findAll();
+	}
+	
+	public String addNewCategory(String category_name) {
+		return cateRepo.addNewCategory(category_name);
+	}
+	
+	public String editCategory(int category_id,String category_name) {
+		return cateRepo.editCategory(category_id,category_name);
+	}
+	
+	public String deleteCategory(int category_id) {
+		return cateRepo.deleteCategory(category_id);
 	}
 }

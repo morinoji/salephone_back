@@ -24,7 +24,6 @@ public class OrderService {
 	    		throw new NoDataFoundException();
 	    	}
 			return temp;
-		
 	}
 	
 	public void placeOrder(PostOrder postOrder) {
@@ -33,5 +32,9 @@ public class OrderService {
 	
 	public void updateStatus(Order order) {
 		orderRepo.updateStatus(order.getOrder_id(), order.getStatus());
+	}
+	
+	public void DeleteOrder(Order order) {
+		orderRepo.DeleteOrder(order.getOrder_id());
 	}
 }

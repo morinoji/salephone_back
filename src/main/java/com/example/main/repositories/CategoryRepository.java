@@ -27,4 +27,19 @@ public class CategoryRepository{
 		return jdbc.query(sql, BeanPropertyRowMapper.newInstance(Category.class));
 	}
 	
+	public String addNewCategory(String category_name) {
+		jdbc.update("insert into categories(category_name) values('"+category_name+"')");
+		return "Thêm danh mục thành công!";
+	}
+	
+	public String editCategory(int category_id, String category_name) {
+		jdbc.update("update categories set category_name='"+category_name+"' where category_id='"+category_id+"'");
+		return "Chỉnh sử danh mục thành công!";
+	}
+	
+	public String deleteCategory(int category_id) {
+		jdbc.update("delete from categories where category_id='"+category_id+"'");
+		jdbc.update("delete from product where category_id='"+category_id+"'");
+		return "Xóa danh mục thành công!";
+	}
 }
