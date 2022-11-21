@@ -53,10 +53,10 @@ public class ProductController {
     public ResponseObject listingProduct(@NotNull @RequestParam("field") String field) {
         return new ResponseObject(200, "Thành công!", productSv.listingProd(field));
     }
-	
+//	@NotNull @RequestParam("limit") Integer limit, @NotNull @RequestParam("offset") Integer offset
 	@RequestMapping(value="/listing-all-product")
-    public ResponseObject listingProduct(@NotNull @RequestParam("limit") Integer limit, @NotNull @RequestParam("offset") Integer offset) {
-        return new ResponseObject(200, "Thành công!", productSv.listingAllProds(offset, limit));
+    public ResponseObject listingProduct() {
+        return new ResponseObject(200, "Thành công!", productSv.listingAllProds());
     }
 
 	@RequestMapping(value="/getProdsByCate")

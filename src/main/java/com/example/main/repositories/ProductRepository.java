@@ -47,8 +47,8 @@ public class ProductRepository {
 		return listProd;
 	}
 	
-	public List<Product> ListingAllProds(int limit, int offset){
-		String query="select * from product OFFSET "+offset+" ROWS FETCH NEXT "+limit+" ROWS ONLY";
+	public List<Product> ListingAllProds(){
+		String query="select * from product ";
 		List<Product> listProd=jdbc.query(query, BeanPropertyRowMapper.newInstance(Product.class));
 		return listProd;
 	}

@@ -50,8 +50,8 @@ public class ProductService {
     	return listProd;
 	}
 	
-	public List<Product> listingAllProds(int limit, int offset){
-		List<Product> listProd=productRepo.ListingAllProds(offset, limit);
+	public List<Product> listingAllProds(){
+		List<Product> listProd=productRepo.ListingAllProds();
     	if(listProd.isEmpty()) {
     		throw new NoDataFoundException();
     	}

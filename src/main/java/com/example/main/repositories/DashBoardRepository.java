@@ -44,7 +44,7 @@ public class DashBoardRepository {
 			Map<String,Object> tempMap=new HashMap<>();
 			String tempQuery="select sum(product.price * orderdetail.quantity) as revenue from orderdetail inner join product on orderdetail.product_id = product.product_id where orderdetail_created_at > TO_DATE('"+01+"/"+i+"/"+dateParse.getYear()+"','dd/mm/yyyy') and orderdetail_created_at < TO_DATE('\"+30+\"/\"+i+\"/\"+dateParse.getYear()+\"','dd/mm/yyyy')";
 			tempMap.putAll(jdbc.queryForMap(tempQuery));
-			yearRevenue.add();
+//			yearRevenue.add();
 		}
 		finalMap.putAll(jdbc.queryForMap(queryRevenue));
 		finalMap.putAll(jdbc.queryForMap(queryAccount));
